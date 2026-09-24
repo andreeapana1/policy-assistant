@@ -1,3 +1,4 @@
 google-genai>=1.40
 slack-bolt>=1.20
 python-dotenv>=1.0
+certifi

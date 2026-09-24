@@ -13,6 +13,11 @@ import logging
 import os
 import re
 
+import certifi
+
+# The python.org installer on macOS ships without trusted certificates; use certifi's bundle.
+os.environ.setdefault("SSL_CERT_FILE", certifi.where())
+
 from dotenv import load_dotenv
 from slack_bolt import App
 from slack_bolt.adapter.socket_mode import SocketModeHandler
