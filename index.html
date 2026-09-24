@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Company Policy Assistant – Approach Comparison</title>
+<style>
+:root{
+  --bg:#f7f7f5; --surface:#ffffff; --ink:#1c1f23; --muted:#5f6670; --line:#e3e3df;
+  --accent:#1f5fa8; --good:#1d7a46; --good-bg:#e5f3ea; --bad:#b3261e; --bad-bg:#fbe9e7;
+  --warn:#8a5a00; --warn-bg:#fdf1d8; --chip:#eef1f5;
+  --c-rules:#7a6a58; --c-llm:#b0572a; --c-vector:#1f5fa8;
+}
+@media (prefers-color-scheme: dark){
+  :root{--bg:#141619; --surface:#1d2024; --ink:#e8e9eb; --muted:#9aa1ab; --line:#30343a;
+    --accent:#7fb0ea; --good:#6fcf97; --good-bg:#16311f; --bad:#f28b82; --bad-bg:#3a1d1b;
+    --warn:#f1c26b; --warn-bg:#3a2e14; --chip:#262a30;
+    --c-rules:#bfae98; --c-llm:#e59a6f; --c-vector:#7fb0ea;}
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+.wrap{max-width:1120px;margin:0 auto;padding:0 16px}
+header{padding:40px 0 20px;border-bottom:1px solid var(--line)}
+h1{font-size:clamp(1.6rem,3.5vw,2.3rem);line-height:1.2;margin:0 0 8px;letter-spacing:-.01em}
+h2{font-size:1.25rem;margin:40px 0 12px}
+.sub{color:var(--muted);margin:0}
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.chip{background:var(--chip);border-radius:999px;padding:3px 11px;font-size:.82rem;color:var(--muted)}
+a{color:var(--accent)}
+.tablewrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;min-width:720px;font-size:.93rem}
+th,td{padding:11px 14px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+thead th{font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:600}
+tbody tr:last-child td{border-bottom:0}
+td.best{font-weight:700}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px;vertical-align:middle}
+.prose p{max-width:75ch;margin:0 0 14px}
+.cards3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px}
+.card h3{margin:0 0 6px;font-size:1rem;display:flex;align-items:center}
+.card p{margin:0;color:var(--muted);font-size:.92rem}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
+.filters button{font:inherit;font-size:.86rem;border:1px solid var(--line);background:var(--surface);color:var(--ink);
+  padding:5px 13px;border-radius:999px;cursor:pointer}
+.filters button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.q{background:var(--surface);border:1px solid var(--line);border-radius:10px;margin-bottom:14px;overflow:hidden}
+.qhead{padding:14px 16px;border-bottom:1px solid var(--line)}
+.qhead .qt{font-weight:600}
+.qhead .qm{font-size:.84rem;color:var(--muted);margin-top:3px}
+.tag{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em;padding:2px 8px;border-radius:4px;margin-right:6px}
+.tag.covered{background:var(--good-bg);color:var(--good)} .tag.partial{background:var(--warn-bg);color:var(--warn)}
+.tag.not_covered{background:var(--chip);color:var(--muted)}
+.qbody{display:grid;grid-template-columns:repeat(3,1fr)}
+.ans{padding:14px 16px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:8px;min-width:0}
+.ans:last-child{border-right:0}
+.ans .who{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;display:flex;align-items:center}
+.ans .txt{font-size:.93rem;overflow-wrap:anywhere}
+.ans .pol{font-size:.85rem}
+.badge{display:inline-block;font-size:.76rem;font-weight:600;padding:2px 8px;border-radius:4px}
+.badge.ok{background:var(--good-bg);color:var(--good)} .badge.no{background:var(--bad-bg);color:var(--bad)}
+.stats{font-size:.8rem;color:var(--muted);margin-top:auto;display:flex;gap:12px;flex-wrap:wrap}
+.why{font-size:.8rem;color:var(--muted)}
+.notes{color:var(--muted);font-size:.9rem;max-width:80ch;padding-left:18px}
+.notes li{margin-bottom:6px}
+footer{border-top:1px solid var(--line);margin-top:40px;padding:20px 0 40px;color:var(--muted);font-size:.88rem}
+.empty{background:var(--warn-bg);color:var(--warn);padding:16px;border-radius:10px;margin-top:24px}
+@media (max-width:760px){
+  .cards3,.qbody{grid-template-columns:1fr}
+  .ans{border-right:0;border-bottom:1px solid var(--line)} .ans:last-child{border-bottom:0}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Company Policy Assistant</h1>
+    <p class="sub">Comparing rules-based search, an LLM without a vector index, and an LLM with a vector index on the same set of employee questions.</p>
+    <div class="meta" id="meta"></div>
+  </header>
+
+  <div id="app"></div>
+
+  <footer>
+    Built by Andreea · University of Southern Denmark ·
+    <a id="repo" href="#">Source code</a> ·
+    The same LLM + vector index approach powers the Slack bot.
+  </footer>
+</div>
+
+<script src="results.js"></script>
+<script>
+(function(){
+  // Link to the GitHub repo is worked out from the GitHub Pages address (user.github.io/repo).
+  const m = location.hostname.match(/^([^.]+)\.github\.io$/);
+  const repoEl = document.getElementById('repo');
+  if (m) { const repo = location.pathname.split('/').filter(Boolean)[0] || (m[1] + '.github.io');
+           repoEl.href = `https://github.com/${m[1]}/${repo}`; }
+
+  const R = window.RESULTS, app = document.getElementById('app');
+  if (!R) { app.innerHTML = '<div class="empty">No results yet. Run <code>python benchmark.py</code> to generate <code>docs/results.js</code>.</div>'; return; }
+
+  const KEYS = ['rules','llm','vector'];
+  const COLORS = {rules:'var(--c-rules)', llm:'var(--c-llm)', vector:'var(--c-vector)'};
+  const S = R.summary, M = R.meta;
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const pct = x => x == null ? '–' : Math.round(x*100) + '%';
+  const sec = x => x < 0.01 ? '<0.01 s' : x.toFixed(2) + ' s';
+  const num = x => Math.round(x).toLocaleString('en-US');
+  const dot = k => `<span class="dot" style="background:${COLORS[k]}"></span>`;
+  const nCovered = R.questions.filter(q => q.type !== 'not_covered').length;
+  const nNot = R.questions.length - nCovered;
+
+  document.getElementById('meta').innerHTML = [
+    `${M.n_policies} policies`, `${M.n_questions} test questions`, `LLM: ${M.gen_model}`,
+    `Embeddings: ${M.embed_model} (top ${M.top_k})`, `Run: ${M.generated_at}`
+  ].map(t => `<span class="chip">${esc(t)}</span>`).join('');
+
+  // ---- Table 1: summary
+  const metrics = [
+    ['Correct policy identified', k => S[k].policy_accuracy, pct, 'max'],
+    ['Unsupported answers', k => S[k].unsupported_rate, (v,k) => `${pct(v)} (${S[k].unsupported_count}/${M.n_questions})`, 'min'],
+    ['Declined when no policy exists', k => S[k].abstain_rate, pct, 'max'],
+    ['Average response time', k => S[k].avg_latency_s, sec, 'min'],
+    ['Median response time', k => S[k].median_latency_s, sec, 'min'],
+    ['Average tokens per question', k => S[k].avg_tokens, num, 'min'],
+  ];
+  let t1 = `<h2>Results at a glance</h2><div class="tablewrap"><table><thead><tr><th>Metric</th>${
+    KEYS.map(k => `<th>${dot(k)}${esc(S[k].label)}</th>`).join('')}</tr></thead><tbody>`;
+  for (const [name, get, fmt, dir] of metrics) {
+    const vals = KEYS.map(get); const valid = vals.filter(v => v != null);
+    const best = dir === 'max' ? Math.max(...valid) : Math.min(...valid);
+    t1 += `<tr><td>${name}</td>${KEYS.map((k,i) => `<td class="${vals[i]===best?'best':''}">${fmt(vals[i],k)}</td>`).join('')}</tr>`;
+  }
+  t1 += `</tbody></table></div>`;
+
+  // ---- Two-paragraph comparison (numbers filled in from the benchmark run)
+  const r = S.rules, l = S.llm, v = S.vector;
+  const tokenRatio = l.avg_tokens / Math.max(1, v.avg_tokens);
+  const p1 = "Rules-based search answered instantly (about 2 ms) and uses no tokens, but because it only matches keywords and a hand-written synonym list it identified the correct policy for just 68% of the 22 test questions. It failed whenever an employee's wording differed from the policy's (\u201ca journalist called\u201d matched the Social Media Policy instead of the Media Contact Policy), and because it always returns its best keyword match it presented unrelated policies as answers, such as the Office Access (badge) policy for \u201cCan I bring my dog to the office?\u201d; 6 of its 22 answers (27%) were unsupported by the policy database and it declined only 2 of the 4 questions that no policy covers. The LLM without a vector index, which receives all 98 policies in every prompt, identified the correct policy in 100% of cases in about 1.1 s, but used about 2,970 tokens per question, a cost that grows with every policy added. The LLM with a vector index retrieves the three most similar policies and sends only those, using about 330 tokens per question (9\u00d7 fewer) at about 1.3 s (slightly slower because of the extra embedding call) and identified the correct policy in 95% of cases; its one miss was \u201cAre jeans allowed on Fridays?\u201d, where it declined instead of citing the Dress Code Policy.";
+  const p2 = "Both LLM approaches were far less likely than rules-based search to give answers the database does not support: each had one flagged answer (5%), both correctly declined all four questions with no matching policy, and on partly covered questions (such as the number of sick days per year) they reported what the policy says and noted that it gives no number instead of inventing one. The flagged answer of the LLM without an index was a genuine fabrication (it said only authorised employees may speak to \u201cwaterfowl or media\u201d), while the vector approach\u2019s flag was a cautious remark that the Work From Abroad Policy does not name specific countries, which the automatic judge rated as unsupported. My preferred approach is the LLM with a vector index: it matches the full-context LLM on grounding, comes close on accuracy and response time, and uses about a ninth of the tokens, and because retrieval keeps the prompt small however many policies exist, it scales to a real policy library that would not fit in one prompt, whereas the full-context approach becomes slower and more expensive as the database grows. It is therefore the approach used in the Slack bot, which shows the cited policy text next to every answer so employees can verify it.";
+  const discussion = `<h2>Comparison and preferred approach</h2><div class="prose"><p>${p1}</p><p>${p2}</p></div>`;
+
+  const how = `<h2>How each approach works</h2><div class="cards3">
+    <div class="card"><h3>${dot('rules')}Rules-based search</h3><p>Keywords from the question (plus a hand-written synonym list) are scored against policy titles, text and categories. The best match's text is returned word for word. No LLM, no tokens.</p></div>
+    <div class="card"><h3>${dot('llm')}LLM without vector index</h3><p>All ${M.n_policies} policies are pasted into the prompt together with the question. The LLM writes the answer and names the policy it used.</p></div>
+    <div class="card"><h3>${dot('vector')}LLM with vector index</h3><p>Policies are embedded once into a vector index. The question is embedded, the ${M.top_k} most similar policies are retrieved, and only those go to the LLM.</p></div></div>`;
+
+  // ---- Question by question (cards, not a table)
+  const filters = [['all','All'],['covered','Covered'],['partial','Partly covered'],['not_covered','Not covered'],['unsupported','Has an unsupported answer']];
+  let qs = `<h2>Question by question</h2><div class="filters" role="group" aria-label="Filter questions">${
+    filters.map(([k,t],i) => `<button data-f="${k}" aria-pressed="${i===0}">${t}</button>`).join('')}</div><div id="qlist"></div>`;
+
+  const typeLabel = {covered:'Covered', partial:'Partly covered', not_covered:'Not covered'};
+  function qCard(q){
+    const exp = q.expected.length ? `Expected policy: ${esc(q.expected.join(' or '))}` : 'Expected: no policy covers this';
+    const cols = KEYS.map(k => {
+      const x = q.results[k];
+      const pol = x.policy_title
+        ? `<span class="badge ${x.policy_correct?'ok':'no'}">${x.policy_correct?'✓':'✗'}</span> ${esc(x.policy_title)}`
+        : `<span class="badge ${x.policy_correct?'ok':'no'}">${x.policy_correct?'✓':'✗'}</span> No policy`;
+      const sup = x.judge.supported ? `<span class="badge ok">Supported</span>` : `<span class="badge no">Unsupported</span>`;
+      return `<div class="ans"><div class="who" style="color:${COLORS[k]}">${dot(k)}${esc(S[k].label)}</div>
+        <div class="txt">${esc(x.answer)}</div>
+        <div class="pol"><strong>Relevant policy:</strong> ${pol}</div>
+        <div>${sup} <span class="why">${esc(x.judge.reason)}</span></div>
+        <div class="stats"><span>⏱ ${sec(x.latency_s)}</span><span>${num(x.tokens.total)} tokens</span></div></div>`;
+    }).join('');
+    return `<div class="q"><div class="qhead"><div class="qt">${esc(q.q)}</div>
+      <div class="qm"><span class="tag ${q.type}">${typeLabel[q.type]}</span>${exp}${q.note ? ' · ' + esc(q.note) : ''}</div></div>
+      <div class="qbody">${cols}</div></div>`;
+  }
+
+  const notes = `<h2>How it was measured</h2><ul class="notes">
+    <li>Each approach answered the same ${M.n_questions} questions: ${R.questions.filter(q=>q.type==='covered').length} covered by a policy, ${R.questions.filter(q=>q.type==='partial').length} where a policy exists but does not give the detail asked for, and ${nNot} with no matching policy.</li>
+    <li>Response time is wall-clock time from question to answer (including the embedding call for the vector approach).</li>
+    <li>Tokens are the prompt, output and thinking tokens reported by the Gemini API; for the vector approach the query embedding (roughly 10–20 tokens, estimated at 4 characters per token) is added. Building the index is a one-time cost of about ${num(M.indexing_tokens_estimate || 0)} tokens.</li>
+    <li>"Unsupported" means the answer states something the policy database does not say, or presents a policy that does not address the question. It was checked by a separate LLM judge that saw the whole database; the judge's tokens are not counted. Answers that correctly say no policy exists count as supported.</li>
+  </ul>`;
+
+  app.innerHTML = t1 + discussion + how + qs + notes;
+
+  const list = document.getElementById('qlist');
+  function render(f){
+    const rows = R.questions.filter(q => f==='all' ? true : f==='unsupported'
+      ? KEYS.some(k => !q.results[k].judge.supported) : q.type===f);
+    list.innerHTML = rows.map(qCard).join('') || '<p class="sub">No questions match this filter.</p>';
+  }
+  document.querySelectorAll('.filters button').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('.filters button').forEach(x => x.setAttribute('aria-pressed', x===b));
+    render(b.dataset.f);
+  }));
+  render('all');
+})();
+</script>
+</body>
+</html>
