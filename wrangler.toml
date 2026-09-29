@@ -1,0 +1,6 @@
+name = "policy-assistant-api"
+main = "src/index.js"
+compatibility_date = "2026-09-01"
+
+# The Gemini API key is NOT set here (this file is safe to commit / share).
+# Set it privately with:  wrangler secret put GEMINI_API_KEY
